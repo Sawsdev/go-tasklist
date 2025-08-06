@@ -64,9 +64,10 @@ func GetDescriptionFromInput(input string) string {
 	return description[1]
 }
 
-func ExecuteCommand(command string, userInput *string, tasks *tasklist.TaskList) {
-	fmt.Println("Executing command:", command)
-	cleanCommand := strings.TrimSpace(command)
+func ExecuteCommand(userInput *string, tasks *tasklist.TaskList) {
+	fullCommand := strings.Split(*userInput, " ")
+	fmt.Println("Executing command:", fullCommand[0])
+	cleanCommand := strings.TrimSpace(fullCommand[0])
 	switch cleanCommand {
 	case ADD:
 		if !strings.Contains(*userInput, "\"") {
@@ -78,7 +79,12 @@ func ExecuteCommand(command string, userInput *string, tasks *tasklist.TaskList)
 	case DELETE:
 		// tasklist.DeleteTask(&tasklist.TaskList, command[2])
 	case LIST:
-		tasklist.ShowTaskList(tasks)
+		if len(fullCommand) > 1 {
+			status := strings.TrimSpace(fullCommand[1])
+			tasklist.ShowTaskList(tasks, status)
+		} else {
+			tasklist.ShowTaskList(tasks, "all")
+		}
 	case UPDATE:
 		// tasklist.UpdateTask(&tasklist.TaskList, command[2], command[3])
 	case MARKDONE:
@@ -138,7 +144,7 @@ func Start() {
 		}
 		userCommand := strings.Split(userInput, " ")
 		command := strings.TrimSpace(userCommand[0])
-		ExecuteCommand(command, &userInput, &tasks)
+		ExecuteCommand(&userInput, &tasks)
 		userInput = ""
 		if command == "terminate" {
 			fmt.Println("Goodbye")
