@@ -85,8 +85,10 @@ func ExecuteCommand(command string, userInput *string, tasks *tasklist.TaskList)
 		// tasklist.MarkTaskAsDone(&tasklist.TaskList, command[2])
 	case MARKPROGRESS:
 	// tasklist.MarkTaskAsInProgress(&tasklist.TaskList, command[2])
+	case TERMINATE:
+		fmt.Println("Exiting program")
 	default:
-		fmt.Println("Unknown command:", command[1])
+		fmt.Println("Unknown command:", cleanCommand)
 	}
 
 }
@@ -96,13 +98,10 @@ func IsValidCommandInput(input string) bool {
 		return false
 	}
 	inputParts := strings.Split(input, " ")
-	if inputParts[0] != "task-cli" {
-		fmt.Println("The instruction must start with 'task-cli'")
-		return false
-	} else if len(inputParts) < 2 {
+	if len(inputParts) < 1 {
 		fmt.Println("The instruction must have a command")
 		return false
-	} else if !IsValidCommand(strings.TrimSpace(inputParts[1])) {
+	} else if !IsValidCommand(strings.TrimSpace(inputParts[0])) {
 		fmt.Println("Invalid command")
 		return false
 	}
@@ -127,18 +126,18 @@ func Start() {
 		fmt.Println(GetCommandDescription(description))
 		fmt.Println("----------------")
 	}
-	fmt.Println("Type the instruction preceded by 'task-cli'")
 	fmt.Println("Type 'terminate' to exit")
 	userInput := ""
 	for {
+		fmt.Print("task-cli ")
 		userInput = GetUserInput()
+		fmt.Println(userInput)
 
 		if !IsValidCommandInput(userInput) {
-			fmt.Println("Invalid input")
 			continue
 		}
 		userCommand := strings.Split(userInput, " ")
-		command := strings.TrimSpace(userCommand[1])
+		command := strings.TrimSpace(userCommand[0])
 		ExecuteCommand(command, &userInput, &tasks)
 		userInput = ""
 		if command == "terminate" {
