@@ -30,16 +30,23 @@ func AddNewTask(taskList *TaskList, description string) {
 	fmt.Println("Task added \n", task)
 }
 
-func ShowTaskList(taskList *TaskList) {
+func ShowTaskList(taskList *TaskList, status string) {
 	fmt.Println("All task in the list:")
 	for _, task := range taskList.Tasks {
-		fmt.Println("-------****--------")
+		if status == "all"{
+			printTask(task)
+		} else if task.Status == status {
+			printTask(task)
+		}
+	}
+}
+
+func printTask(task task.Task)  {
+	fmt.Println("-------****--------")
 		fmt.Println("Id:", task.Id)
 		fmt.Println("Description:", task.Description)
 		fmt.Println("Status:", task.Status)
 		fmt.Println("Created at:", task.CreatedAt)
 		fmt.Println("Updated at:", task.UpdatedAt)
 		fmt.Println("-------****--------")
-	}
 }
-
