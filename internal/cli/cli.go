@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
-
+	"strconv"
 	"github.com/sawsdevx8/tasktracker/internal/tasklist"
 )
 
@@ -17,6 +17,7 @@ const (
 	MARKDONE     = "mark-done"
 	MARKPROGRESS = "mark-progress"
 	TERMINATE    = "terminate"
+	COMMANDS     = "commands"
 )
 
 var cliCommands = map[string]string{
@@ -27,6 +28,7 @@ var cliCommands = map[string]string{
 	MARKDONE:     "mark-done",
 	MARKPROGRESS: "mark-progress",
 	TERMINATE:    "terminate",
+	COMMANDS:     "commands",
 }
 
 func IsValidCommand(command string) bool {
@@ -42,6 +44,8 @@ func GetCommandDescription(command string) string {
 	switch command {
 	case ADD:
 		return "Add a task to the list \nej: add \"Make coffee\""
+	case COMMANDS:
+		return "List all available commands"
 	case DELETE:
 		return "Delete a task from the list \nej: delete 1"
 	case LIST:
@@ -76,6 +80,8 @@ func ExecuteCommand(userInput *string, tasks *tasklist.TaskList) {
 			return
 		}
 		tasklist.AddNewTask(tasks, GetDescriptionFromInput(*userInput))
+	case COMMANDS:
+		showCommandDescriptions()
 	case DELETE:
 		// tasklist.DeleteTask(&tasklist.TaskList, command[2])
 	case LIST:
@@ -86,11 +92,46 @@ func ExecuteCommand(userInput *string, tasks *tasklist.TaskList) {
 			tasklist.ShowTaskList(tasks, "all")
 		}
 	case UPDATE:
+		if len(fullCommand) > 2 && strings.Contains(*userInput, "\"") {
+			var id int = 0
+			id, err := strconv.Atoi(strings.TrimSpace(fullCommand[1]))
+			if err != nil {
+				fmt.Println("Invalid input, no correct id found")
+				fmt.Println("ej: update 1 \"Make coffee with milk\"")
+				return
+			}
+			tasklist.UpdateTask(tasks, id, GetDescriptionFromInput(*userInput), "")
+			
+		} else {
+			fmt.Println("Invalid input, no correct description found")
+			fmt.Println("ej: update 1 \"Make coffee with milk\"")
+			return
+		}
 		// tasklist.UpdateTask(&tasklist.TaskList, command[2], command[3])
 	case MARKDONE:
-		// tasklist.MarkTaskAsDone(&tasklist.TaskList, command[2])
+		if len(fullCommand) > 1 {
+			var id int = 0
+			id, err := strconv.Atoi(strings.TrimSpace(fullCommand[1]))
+			if err != nil {
+				fmt.Println("Invalid input, no correct id found")
+				fmt.Println("ej: mark-done 1")
+				return
+			}
+			tasklist.MarkTaskAsDone(tasks, id)
+			
+		}
 	case MARKPROGRESS:
-	// tasklist.MarkTaskAsInProgress(&tasklist.TaskList, command[2])
+		if len(fullCommand) > 1 {
+			var id int = 0
+			id, err := strconv.Atoi(strings.TrimSpace(fullCommand[1]))
+			if err != nil {
+				fmt.Println("Invalid input, no correct id found")
+				fmt.Println("ej: mark-done 1")
+				return
+			}
+			tasklist.MarkTaskAsInProgress(tasks, id)
+			
+		}
 	case TERMINATE:
 		fmt.Println("Exiting program")
 	default:
@@ -122,16 +163,20 @@ func GetUserInput() string {
 	return text
 }
 
-func Start() {
-
-	tasks := tasklist.NewTaskList()
-	fmt.Println("Task CLI")
-	fmt.Println("Available commands:")
+func showCommandDescriptions() {
 	for command, description := range cliCommands {
 		fmt.Println(command, ":")
 		fmt.Println(GetCommandDescription(description))
 		fmt.Println("----------------")
 	}
+}
+
+func Start() {
+
+	tasks := tasklist.NewTaskList()
+	fmt.Println("Task CLI")
+	fmt.Println("Available commands:")
+	showCommandDescriptions()
 	fmt.Println("Type 'terminate' to exit")
 	userInput := ""
 	for {
