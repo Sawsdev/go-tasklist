@@ -10,6 +10,19 @@ const (
 	layout = "2006-01-02 15:04:05"
 )
 
+const (
+	TODO = "todo"
+	DONE = "done"
+	PROGRESS = "in-progress"
+)
+
+
+var Statuses = map[string]string{
+	TODO: "todo",
+	DONE : "done", 
+	PROGRESS : "in-progress",
+}
+
 type TaskList struct {
 	Tasks []task.Task
 }
@@ -40,6 +53,41 @@ func ShowTaskList(taskList *TaskList, status string) {
 		}
 	}
 }
+
+func UpdateTask(taskList *TaskList, id int, description string, status string) {
+	updateTask(taskList, id, description, status)
+}
+
+func MarkTaskAsDone(taskList *TaskList, id int) {
+	updateTask(taskList, id, "", DONE)
+}
+
+func MarkTaskAsInProgress(taskList *TaskList, id int) {
+	updateTask(taskList, id, "", PROGRESS)
+}
+
+
+func updateTask(taskList *TaskList, id int, description string, status string) {
+	for i := range taskList.Tasks {
+		if taskList.Tasks[i].Id == id {
+			
+			if status == "" && description == "" {
+				fmt.Println("Nothing to update")
+				return
+			}
+			if description != "" {
+				taskList.Tasks[i].Description = description
+			} else if condition := Statuses[status]; condition != "" {
+				taskList.Tasks[i].Status = status
+			}
+			taskList.Tasks[i].UpdatedAt = time.Now().Format(layout)
+			fmt.Println("Task updated \n", taskList.Tasks[i])
+			break
+		}
+	}
+	fmt.Println("Task not found")
+}
+
 
 func printTask(task task.Task)  {
 	fmt.Println("-------****--------")
