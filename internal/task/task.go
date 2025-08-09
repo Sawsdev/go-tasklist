@@ -9,24 +9,13 @@ type Task struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
-const (
-	TODO = "todo"
-	DONE = "done"
-	PROGRESS = "in-progress"
-)
 
-
-var Statuses = map[string]string{
-	TODO: "todo",
-	DONE : "done", 
-	PROGRESS : "in-progress",
-}
 
 func NewTask(id int, description string , createdAt string, updatedAt string) Task {
 	return Task{
 		Id: id,
 		Description: description,
-		Status: TODO,
+		Status: "todo",
 		CreatedAt: createdAt,
 		UpdatedAt: updatedAt,
 	}
