@@ -29,6 +29,13 @@ func FileExists(filename string) bool{
 	return false
 }
 
+func MakeDirectory(foldername string){
+	err := os.Mkdir(foldername, 0755)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func ReadFile(filename string) ([]byte, error){
 	file, err := os.ReadFile(baseRoute + filename)
 	if err != nil {
