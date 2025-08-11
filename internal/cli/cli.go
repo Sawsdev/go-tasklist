@@ -7,6 +7,9 @@ import (
 	"strings"
 	"strconv"
 	"github.com/sawsdevx8/tasktracker/internal/tasklist"
+	"github.com/sawsdevx8/tasktracker/internal/file"
+	"encoding/json"
+	"log"
 )
 
 const (
@@ -171,10 +174,34 @@ func showCommandDescriptions() {
 	}
 }
 
+func loadTaskListFromFile() tasklist.TaskList {
+	if !file.FileExists("") {
+		file.MakeDirectory("assets")
+	}
+	if file.FileExists("todolist.json") {
+		file, err := file.ReadFile("todolist.json")
+		if err != nil {
+			log.Fatal(err)
+		}
+		tasklist := tasklist.NewTaskList()
+		err = json.Unmarshal(file, &tasklist.Tasks)
+		if err != nil {
+			log.Fatal(err)
+		}
+		return tasklist
+		
+	}
+	file.CreateFile("todolist.json")
+	
+	return tasklist.NewTaskList()
+}
+
 func Start() {
 
-	tasks := tasklist.NewTaskList()
-	fmt.Println("Task CLI")
+	fmt.Println("Loading task list from file")
+	tasks := loadTaskListFromFile()
+	fmt.Println("Done")
+	fmt.Println("Initializing Task CLI")
 	fmt.Println("Available commands:")
 	showCommandDescriptions()
 	fmt.Println("Type 'terminate' to exit")
