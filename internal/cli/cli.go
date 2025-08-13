@@ -85,8 +85,21 @@ func ExecuteCommand(userInput *string, tasks *tasklist.TaskList) {
 		tasklist.AddNewTask(tasks, GetDescriptionFromInput(*userInput))
 	case COMMANDS:
 		showCommandDescriptions()
+		return
 	case DELETE:
-		// tasklist.DeleteTask(&tasklist.TaskList, command[2])
+		if len(fullCommand) > 1 {
+			var id int = 0
+			id, err := strconv.Atoi(strings.TrimSpace(fullCommand[1]))
+			if err != nil {
+				fmt.Println("Invalid input, no correct id found")
+				fmt.Println("ej: delete 1")
+				return
+			}
+			tasklist.DeleteTask(tasks, id)
+		} else {
+			fmt.Println("Invalid input, no correct id found")
+			fmt.Println("ej: delete 1")
+		}
 	case LIST:
 		if len(fullCommand) > 1 {
 			status := strings.TrimSpace(fullCommand[1])
@@ -140,6 +153,7 @@ func ExecuteCommand(userInput *string, tasks *tasklist.TaskList) {
 	default:
 		fmt.Println("Unknown command:", cleanCommand)
 	}
+	saveTaskListToFile(tasks)
 
 }
 
@@ -194,6 +208,14 @@ func loadTaskListFromFile() tasklist.TaskList {
 	file.CreateFile("todolist.json")
 	
 	return tasklist.NewTaskList()
+}
+
+func saveTaskListToFile(taskList *tasklist.TaskList) {
+	tasklistData, err := json.MarshalIndent(taskList.Tasks, "", "  ")
+	if err != nil {
+		log.Fatal(err)
+	}
+	file.WriteFile("todolist.json", tasklistData)
 }
 
 func Start() {
