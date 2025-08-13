@@ -45,3 +45,11 @@ func ReadFile(filename string) ([]byte, error){
 	return file, err
 
 }
+
+
+func WriteFile(filename string, content []byte){
+	err := os.WriteFile(baseRoute + filename, content, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
