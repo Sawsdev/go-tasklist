@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 	"github.com/sawsdevx8/tasktracker/internal/task"
+	"slices"
 )
 
 const (
@@ -66,6 +67,19 @@ func MarkTaskAsInProgress(taskList *TaskList, id int) {
 	updateTask(taskList, id, "", PROGRESS)
 }
 
+func DeleteTask(taskList *TaskList, id int) {
+	for i := range taskList.Tasks {
+		if taskList.Tasks[i].Id == id {
+			taskList.Tasks = slices.DeleteFunc(taskList.Tasks, func(t task.Task) bool {
+				return t.Id == id
+			})
+			fmt.Println("Task deleted")
+			return
+		}
+	}
+	fmt.Println("Task not found")
+}
+
 
 func updateTask(taskList *TaskList, id int, description string, status string) {
 	for i := range taskList.Tasks {
@@ -82,7 +96,7 @@ func updateTask(taskList *TaskList, id int, description string, status string) {
 			}
 			taskList.Tasks[i].UpdatedAt = time.Now().Format(layout)
 			fmt.Println("Task updated \n", taskList.Tasks[i])
-			break
+			return
 		}
 	}
 	fmt.Println("Task not found")
