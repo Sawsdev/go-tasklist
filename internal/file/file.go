@@ -21,8 +21,7 @@ func CreateFile(filename string){
 
 func FileExists(filename string) bool{
 
-	if file, err := os.Stat(baseRoute + filename); err == nil{
-		fmt.Println(file.Name())
+	if _, err := os.Stat(baseRoute + filename); err == nil{
 		return true
 	}
 

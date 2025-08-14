@@ -18,7 +18,7 @@ const (
 	LIST         = "list"
 	UPDATE       = "update"
 	MARKDONE     = "mark-done"
-	MARKPROGRESS = "mark-progress"
+	MARKPROGRESS = "mark-in-progress"
 	TERMINATE    = "terminate"
 	COMMANDS     = "commands"
 )
@@ -29,7 +29,7 @@ var cliCommands = map[string]string{
 	LIST:         "list",
 	UPDATE:       "update",
 	MARKDONE:     "mark-done",
-	MARKPROGRESS: "mark-progress",
+	MARKPROGRESS: "mark-in-progress",
 	TERMINATE:    "terminate",
 	COMMANDS:     "commands",
 }
@@ -142,7 +142,7 @@ func ExecuteCommand(userInput *string, tasks *tasklist.TaskList) {
 			id, err := strconv.Atoi(strings.TrimSpace(fullCommand[1]))
 			if err != nil {
 				fmt.Println("Invalid input, no correct id found")
-				fmt.Println("ej: mark-done 1")
+				fmt.Println("ej: mark-in-progress 1")
 				return
 			}
 			tasklist.MarkTaskAsInProgress(tasks, id)
@@ -192,22 +192,25 @@ func loadTaskListFromFile() tasklist.TaskList {
 	if !file.FileExists("") {
 		file.MakeDirectory("assets")
 	}
+	tasklist := tasklist.NewTaskList()
 	if file.FileExists("todolist.json") {
 		file, err := file.ReadFile("todolist.json")
 		if err != nil {
 			log.Fatal(err)
 		}
-		tasklist := tasklist.NewTaskList()
 		err = json.Unmarshal(file, &tasklist.Tasks)
 		if err != nil {
 			log.Fatal(err)
 		}
 		return tasklist
 		
+	} else {
+		file.CreateFile("todolist.json")
+		file.WriteFile("todolist.json", []byte("[]"))
+
 	}
-	file.CreateFile("todolist.json")
 	
-	return tasklist.NewTaskList()
+	return tasklist
 }
 
 func saveTaskListToFile(taskList *tasklist.TaskList) {
@@ -231,7 +234,6 @@ func Start() {
 	for {
 		fmt.Print("task-cli ")
 		userInput = GetUserInput()
-		fmt.Println(userInput)
 
 		if !IsValidCommandInput(userInput) {
 			continue
